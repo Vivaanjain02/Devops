@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Pipeline - Static App
 
 on:
   push:
@@ -16,5 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Print success message
-        run: echo "GitHub Actions CI is working!"
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-static-app .
+
+      - name: Run container (smoke test)
+        run: |
+          docker run -d -p 8080:80 --name test-container devops-static-app
+          sleep 5
+          curl -f http://localhost:8080
